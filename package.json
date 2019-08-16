@@ -5,7 +5,7 @@
   "main": "./lib/http-server",
   "repository": {
     "type": "git",
-    "url": "git://github.com/indexzero/http-server.git"
+    "url": "git://github.com/http-party/http-server.git"
   },
   "keywords": [
     "cli",
@@ -13,13 +13,20 @@
   ],
   "scripts": {
     "start": "node ./bin/http-server",
-    "pretest": "common bin/http-server lib/ test",
+    "pretest": "eslint bin/http-server lib/ test",
     "test": "vows --spec --isolate"
   },
   "files": [
     "lib",
     "bin"
   ],
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es6": true
+    },
+    "extends": "populist"
+  },
   "contributors": [
     {
       "name": "Charlie Robbins",
@@ -73,7 +80,6 @@
     "basic-auth": "^1.0.3",
     "colors": "^1.3.3",
     "corser": "^2.0.1",
-    "ecstatic": "^3.3.0",
     "http-proxy": "^1.17.0",
     "opener": "^1.5.1",
     "optimist": "~0.6.1",
@@ -82,12 +88,13 @@
     "union": "~0.5.0"
   },
   "devDependencies": {
-    "common-style": "^3.0.0",
+    "eslint": "^6.0.1",
+    "eslint-config-populist": "^4.2.0",
     "request": "^2.88.0",
     "vows": "~0.7.0"
   },
   "bugs": {
-    "url": "https://github.com/nodeapps/http-server/issues"
+    "url": "https://github.com/http-party/http-server/issues"
   },
   "license": "MIT",
   "preferGlobal": "true",
