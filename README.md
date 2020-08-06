@@ -1,12 +1,16 @@
-[![build status](https://img.shields.io/travis/http-party/http-server.svg?style=flat-square)](https://travis-ci.org/http-party/http-server)
-[![npm](https://img.shields.io/npm/v/http-server.svg?style=flat-square)](https://www.npmjs.com/package/http-server) [![homebrew](https://img.shields.io/homebrew/v/http-server?style=flat-square)](https://formulae.brew.sh/formula/http-server) [![npm downloads](https://img.shields.io/npm/dm/http-server?color=blue&label=npm%20downloads&style=flat-square)](https://www.npmjs.com/package/http-server)
-[![license](https://img.shields.io/github/license/http-party/http-server.svg?style=flat-square)](https://github.com/http-party/http-server)
-
+[![license](https://img.shields.io/github/license/http-party/http-server.svg?style=flat-square)](https://github.com/yiyingcanfeng/http-server)
+## Forked from [http-server](https://github.com/http-party/http-server)
 # http-server: a command-line http server
 
 `http-server` is a simple, zero-configuration command-line http server.  It is powerful enough for production usage, but it's simple and hackable enough to be used for testing, local development, and learning.
 
-![Example of running http-server](https://github.com/http-party/http-server/raw/master/screenshots/public.png)
+Change notes:
+
+- Supports detecting the physical adapter ip and show qrcode for mobile device to visit.
+
+![Example of running http-server](https://github.com/yiyingcanfeng/http-server/raw/master/screenshots/public.png)
+
+![Example of running http-server](https://github.com/yiyingcanfeng/http-server/raw/master/screenshots/terminal.png)
 
 ## Installation:
 
@@ -25,7 +29,7 @@ This will install `http-server` globally so that it may be run from the command 
 Using `npx` you can run the script without installing it first:
 
     npx http-server [path] [options]
-     
+
 #### As a dependency in your `npm` package:
 
     npm install http-server

@@ -10,6 +10,10 @@ var colors     = require('colors/safe'),
     fs         = require('fs'),
     argv       = require('minimist')(process.argv.slice(2));
 var ifaces = os.networkInterfaces();
+var QRCode = require('qrcode')
+var iconv = require('iconv-lite')
+var exec = require("child_process").exec
+let platform = os.platform()
 
 process.title = 'http-server';
 
@@ -174,13 +178,81 @@ function listen(port) {
       logger.info(('  ' + protocol + canonicalHost + ':' + colors.green(port.toString())));
     }
     else {
-      Object.keys(ifaces).forEach(function (dev) {
-        ifaces[dev].forEach(function (details) {
-          if (details.family === 'IPv4') {
-            logger.info(('  ' + protocol + details.address + ':' + colors.green(port.toString())));
+      let ips = []
+      let execCmd = ''
+      if (platform === 'win32') {
+        execCmd = 'route print -4'
+      }
+      if (platform === 'linux'){
+        execCmd = 'ip route'
+      }
+      if (platform === 'darwin'){
+        execCmd = 'route -n get default'
+      }
+      exec(execCmd, {encoding: 'buffer'}, function (err, stdout, stderr) {
+        // var buffer = new Buffer(stdout)
+        let str = iconv.decode(stdout, 'gbk')
+        for (const s of str.split('\n')) {
+          if (platform === 'win32') {
+            if (/ 0.0.0.0/.test(s)) {
+              let ip = s.split(/ +/)[4]
+              if (ip && ip.indexOf('default') === -1 && ip.indexOf('默认') === -1) {
+                ips.push(ip)
+              }
+            }
           }
+          if (platform === 'linux') {
+            let regex = /.*default via (\d+\.\d+\.\d+\.\d+) /
+            if (s.match(regex)) {
+              let ip = s.match(regex)[1]
+              if (ips.indexOf(ip) === -1) {
+                ips.push(ip)
+              }
+            }
+          }
+          if (platform === 'darwin') {
+            let ip = s.split('gateway: ')[1]
+            if (ip) {
+              ips.push(ip)
+            }
+          }
+        }
+        let ifacesIps = []
+        Object.keys(ifaces).forEach(function (dev) {
+          ifaces[dev].forEach(function (details) {
+            if (details.family === 'IPv4') {
+              ifacesIps.push(details.address)
+              logger.info(('  ' + protocol + details.address + ':' + colors.green(port.toString())));
+            }
+          });
         });
-      });
+        logger.info('\nMobile devices in the same network can scan the qrcode to visit.\n')
+        if (platform === 'win32') {
+          var c = ips.filter(function(v){ return ifacesIps.indexOf(v) > -1 })
+          if (c.length > 0) {
+            for (const c1 of c) {
+              let text = protocol + c1 + ':' + port.toString()
+              logger.info(text)
+              logger.info(QRCode.toString(text,{type:'terminal'}, function (err, url) {
+              }))
+            }
+          }
+        }
+        if (platform === 'linux' || platform === 'darwin') {
+          for (const ip of ips) {
+            let sp = ip.split('.')
+            for (const ifacesIp of ifacesIps) {
+              let sp1 = ifacesIp.split('.')
+              if (sp[0] === sp1[0] && sp[1] === sp1[1] && sp[2] === sp1[2]) {
+                let text = protocol + ifacesIp + ':' + port.toString()
+                logger.info(text)
+                logger.info(QRCode.toString(text,{type:'terminal'}, function (err, url) {
+                }))
+              }
+            }
+          }
+        }
+      })
     }
 
     if (typeof proxy === 'string') {
